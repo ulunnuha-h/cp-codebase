@@ -204,3 +204,56 @@ int kruskal(int V, vector<pair<int, pair<int, int>>>& edges) {
 
     return minCost;
 }
+
+/*
+===== Graph Coloring =====
+V is total vertex, adj list
+*/
+vector<int> graphColoring(int V, vector<vector<int>>& adj, int maxColor) {
+    vector<int> result(V, -1);
+    result[0] = 0;
+    vector<bool> available(maxColor, true);
+
+    for (int u = 1; u < V; u++) {
+        fill(available.begin(), available.end(), true);
+        for (int i : adj[u]) {
+            if (result[i] != -1) {
+                available[result[i]] = false;
+            }
+        }
+
+        for(int i = 0 ; i < maxColor ; i++){
+            if (available[i]) {
+                result[u] = i;
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+/*
+===== Shorterst Path using BFS =====
+V is total vertex, adj list
+*/
+vector<int> shortestPathBFS(int V, vector<vi> adj){
+    vector<int> dis(V, -1);
+    queue<int> q;
+    dis[0] = 0;
+    q.push(0);
+
+    while (!q.empty()) {
+        int cur = q.front();
+        q.pop();
+
+        for (int neighbor : adj[cur]) {
+            if (dis[neighbor] == -1) { 
+                dis[neighbor] = dis[cur] + 1;
+                q.push(neighbor);
+            }
+        }
+    }
+
+    return dis;
+}
