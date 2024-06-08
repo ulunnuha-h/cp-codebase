@@ -65,3 +65,15 @@ ll combMod(int n, int i) {
     div %= MOD;  div = powMod(div, MOD - 2, MOD);
     return (res * div) % MOD;
 }
+
+// ===== Precompute Combination using DP ===== //
+void precomputeCombination(vector<vector<ll>>& nCr){
+    int n = nCr.size();
+    nCr[0][0] = 1ll;
+    for (int i = 1; i < n; i++){
+        nCr[i][0] = 1ll;
+        for (int j = 1; j <= i; j++){
+            nCr[i][j] = nCr[i-1][j] + nCr[i-1][j-1];
+        }
+    }
+}
