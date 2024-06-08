@@ -1,3 +1,7 @@
+// Rumus deret n*(n+1)
+// Rumus deret kuadrat (n*(n+1)*(2n+1))/6
+// Rumus deret kubik (n^2*(n+1)^2)/4
+
 // ===== Power function with modulo ===== //
 ll powMod(ll x, ll y) {
     ll res = 1;
