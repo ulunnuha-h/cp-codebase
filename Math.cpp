@@ -58,12 +58,36 @@ double getAngle(pii a, pii b) {
     return (a.fi < 0 ? 360 - angleDeg : angleDeg);
 }
 
+// ===== Factorial Precomputation ===== //
+long long fact[N];
+void initfact() {
+    fact[0] = 1;
+    for(int i = 1; i < N; i++) {
+        fact[i] = (fact[i-1] * i);
+        fact[i] %= MOD;
+    }
+}
+
 // ===== Get Combination to select i from n -> C(n, i) ===== //
 ll combMod(int n, int i) {
     long long res = fact[n];
     long long div = fact[n-i] * fact[i];
     div %= MOD;  div = powMod(div, MOD - 2, MOD);
     return (res * div) % MOD;
+}
+
+// ===== Get Combination without using factorial ===== //
+ll comb(ll n, ll r){
+    if(r > n) return 0;
+    if(r == 0 || r == n) return 1;
+    if(r > n - r) r = n - r;
+
+    ll res = 1;
+    rep(i, r){
+        res *= (n-i);
+        res /= (i+1);
+    }
+    return res;
 }
 
 // ===== Precompute Combination using DP ===== //
@@ -76,4 +100,36 @@ void precomputeCombination(vector<vector<ll>>& nCr){
             nCr[i][j] = nCr[i-1][j] + nCr[i-1][j-1];
         }
     }
+}
+
+// ===== Euler's Totient Precomputation ===== //
+// Calculate how many positive number less than N that is coprime with N
+ int i, j;
+    for(i = 0;i < MAX;++i)
+        toti[i] = i;
+    for(i = 2;i < MAX;++i)
+    {
+        if(toti[i] == i)
+        {
+            toti[i] = i - 1;
+            for(j = 2*i;j < MAX;j += i)
+                toti[j] -= (toti[j] / i);
+        }
+    }
+
+
+// ===== Sieve of Eratosthenes ===== //
+// Pre calculate all Prime numbers
+vector<bool> SieveOfEratosthenes(int n){
+    vector<bool> prime(n+1, true);
+    prime[0] = prime[1] = false;
+ 
+    for (int p = 2; p * p <= n; p++) {
+        if (prime[p] == true) {
+            for (int i = p * p; i <= n; i += p)
+                prime[i] = false;
+        }
+    }
+ 
+    return prime;
 }
