@@ -53,12 +53,13 @@ Used for union find algorithm
 using namespace std; 
 
 class DisjSet { 
-	int *rank, *parent, n; 
+	int *rank, *parent, *size, n; 
 public: 
 	DisjSet(int n) 
 	{ 
 		rank = new int[n]; 
 		parent = new int[n]; 
+        size = new int[n];
 		this->n = n; 
 		makeSet(); 
 	} 
@@ -76,20 +77,34 @@ public:
 		return parent[x]; 
 	} 
 
-	void Union(int x, int y){ 
-		int xset = find(x); 
-		int yset = find(y); 
-		if (xset == yset) return; 
+	void unionByRank(int i, int j){ 
+		int iset = find(i); 
+		int jset = find(j); 
+		if (iset == jset) return; 
 
-		if (rank[xset] < rank[yset]) { 
-			parent[xset] = yset; 
-		} else if (rank[xset] > rank[yset]) { 
-			parent[yset] = xset; 
+		if (rank[iset] < rank[jset]) { 
+			parent[iset] = jset; 
+		} else if (rank[iset] > rank[jset]) { 
+			parent[jset] = iset; 
 		} else { 
-			parent[yset] = xset; 
-			rank[xset] = rank[xset] + 1; 
+			parent[jset] = iset; 
+			rank[iset] = rank[iset] + 1; 
 		} 
 	} 
+
+    void unionBySize(int i, int j) { 
+        int irep = find(i); 
+        int jrep = find(j); 
+        if (irep == jrep) return; 
+
+        if (size[irep] < size[jrep]) {
+            parent[irep] = jrep; 
+            size[jrep] += size[irep]; 
+        } else {  
+            parent[jrep] = irep; 
+            size[irep] += size[jrep]; 
+        } 
+} 
 }; 
 
 
