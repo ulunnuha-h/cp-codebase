@@ -47,20 +47,51 @@ vector<int> findScc(vector<vector<int>>& adj, int n) {
 ===== Disjoint Set =====
 Used for union find algorithm
 */
-int findParent(vector<int>& parent, int i) { 
-    if (parent[i] == i) return i;
-    else {  
-        int result = findParent(parent, parent[i]); 
-        parent[i] = result; 
-        return result; 
-    } 
-}
+// C++ implementation of disjoint set 
 
-void unionSet(vector<int>& parent, int i, int j) { 
-    int irep = findParent(parent, i);
-    int jrep = findParent(parent, j); 
-    if(jrep != irep) parent[irep] = jrep; 
-}
+#include <bits/stdc++.h> 
+using namespace std; 
+
+class DisjSet { 
+	int *rank, *parent, n; 
+public: 
+	DisjSet(int n) 
+	{ 
+		rank = new int[n]; 
+		parent = new int[n]; 
+		this->n = n; 
+		makeSet(); 
+	} 
+
+	void makeSet() 
+	{ 
+		for (int i = 0; i < n; i++) parent[i] = i; 
+	} 
+
+	int find(int x) { 
+		if (parent[x] != x) { 
+			parent[x] = find(parent[x]); 
+		} 
+
+		return parent[x]; 
+	} 
+
+	void Union(int x, int y){ 
+		int xset = find(x); 
+		int yset = find(y); 
+		if (xset == yset) return; 
+
+		if (rank[xset] < rank[yset]) { 
+			parent[xset] = yset; 
+		} else if (rank[xset] > rank[yset]) { 
+			parent[yset] = xset; 
+		} else { 
+			parent[yset] = xset; 
+			rank[xset] = rank[xset] + 1; 
+		} 
+	} 
+}; 
+
 
 /*
 ===== Dijkstra Algorithm =====
