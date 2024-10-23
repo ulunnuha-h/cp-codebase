@@ -121,7 +121,7 @@ vector<int> dijkstra(int V, vector<pair<int, int>> adj[], int S){
         pair<int, int> cur = pq.top();
         pq.pop();
         
-        for(pii i : adj[cur.second]){
+        for(pair<int, int> i : adj[cur.second]){
             if(result[i.first] > result[cur.second] + i.second){
                 pq.push({i.second * - 1, i.first});
                 result[i.first] = result[cur.second] + i.second;
@@ -230,6 +230,21 @@ int prim(int V, vector<vector<pair<int, int>>>& adj){
 V is total vertex, edges is edge list consist of {weight, {source, destination}}
 used for minimum spanning tree
 */
+int findParent(vector<int>& parent, int i) { 
+    if (parent[i] == i) return i;
+    else {  
+        int result = findParent(parent, parent[i]); 
+        parent[i] = result; 
+        return result; 
+    } 
+}
+
+void unionSet(vector<int>& parent, int i, int j) { 
+    int irep = findParent(parent, i);
+    int jrep = findParent(parent, j); 
+    if(jrep != irep) parent[irep] = jrep; 
+}
+
 int kruskal(int V, vector<pair<int, pair<int, int>>>& edges) {
     vector<int> parent(V, -1);
     int minCost = 0;
@@ -283,7 +298,7 @@ vector<int> graphColoring(int V, vector<vector<int>>& adj, int maxColor) {
 ===== Shorterst Path using BFS =====
 V is total vertex, adj list
 */
-vector<int> shortestPathBFS(int V, vector<vi> adj){
+vector<int> shortestPathBFS(int V, vector<vector<int>> adj){
     vector<int> dis(V, -1);
     queue<int> q;
     dis[0] = 0;
