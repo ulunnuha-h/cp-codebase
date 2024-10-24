@@ -43,6 +43,51 @@ vector<int> findScc(vector<vector<int>>& adj, int n) {
     return res;
 }
 
+/* 
+===== Kosaraju's Algorithm  =====
+for finding the strongly connected components (SCCs) of a directed graph
+Strongly Connected Components represents a group of nodes that can reach each other through directed paths.
+*/
+class Kosaraju{
+    public:
+    int id = 1;
+    int timer = 0;
+
+    void dfsTime(vector<vector<int>>& adj, vector<pair<int, int>>& time, int a){
+        time[a].first = timer; timer++;
+        for(auto i : adj[a]) if(time[i].first == -1) dfsTime(adj, time, i);
+        time[a].second = timer; timer++;
+    }
+
+
+    void dfsComponent(vector<vector<int>>& rdj, vector<int>& res, int a){
+        res[a] = id;
+        for(auto i : rdj[a]) if(res[i] == -1) dfsComponent(rdj, res, i);
+    }
+
+    vector<int> findScc(vector<vector<int>>& adj, vector<vector<int>>& rdj, int n){
+        vector<int> res(n, -1);
+        vector<pair<int, int>> time(n, {-1, -1});
+        priority_queue<pair<int, int>> pq;
+        stack<int> st;
+
+        for(int i = 0 ; i < n ; i++) if(time[i].first == -1) dfsTime(adj, time, i);
+        for(int i = 0 ; i < n ; i++) pq.push({time[i].second, i});
+
+        while(!pq.empty()){
+            pair<int, int> cur = pq.top();
+            pq.pop();
+
+            if(res[cur.second] == -1){
+                dfsComponent(rdj, res, cur.second);
+                id++;
+            }
+        }
+
+        return res;
+    }
+};
+
 /*
 ===== Disjoint Set =====
 Used for union find algorithm
@@ -53,12 +98,13 @@ Used for union find algorithm
 using namespace std; 
 
 class DisjSet { 
-	int *rank, *parent, n; 
+	int *rank, *parent, *size, n; 
 public: 
 	DisjSet(int n) 
 	{ 
 		rank = new int[n]; 
 		parent = new int[n]; 
+        size = new int[n];
 		this->n = n; 
 		makeSet(); 
 	} 
@@ -76,20 +122,34 @@ public:
 		return parent[x]; 
 	} 
 
-	void Union(int x, int y){ 
-		int xset = find(x); 
-		int yset = find(y); 
-		if (xset == yset) return; 
+	void unionByRank(int i, int j){ 
+		int iset = find(i); 
+		int jset = find(j); 
+		if (iset == jset) return; 
 
-		if (rank[xset] < rank[yset]) { 
-			parent[xset] = yset; 
-		} else if (rank[xset] > rank[yset]) { 
-			parent[yset] = xset; 
+		if (rank[iset] < rank[jset]) { 
+			parent[iset] = jset; 
+		} else if (rank[iset] > rank[jset]) { 
+			parent[jset] = iset; 
 		} else { 
-			parent[yset] = xset; 
-			rank[xset] = rank[xset] + 1; 
+			parent[jset] = iset; 
+			rank[iset] = rank[iset] + 1; 
 		} 
 	} 
+
+    void unionBySize(int i, int j) { 
+        int irep = find(i); 
+        int jrep = find(j); 
+        if (irep == jrep) return; 
+
+        if (size[irep] < size[jrep]) {
+            parent[irep] = jrep; 
+            size[jrep] += size[irep]; 
+        } else {  
+            parent[jrep] = irep; 
+            size[irep] += size[jrep]; 
+        } 
+} 
 }; 
 
 
@@ -106,7 +166,7 @@ vector<int> dijkstra(int V, vector<pair<int, int>> adj[], int S){
         pair<int, int> cur = pq.top();
         pq.pop();
         
-        for(pii i : adj[cur.second]){
+        for(pair<int, int> i : adj[cur.second]){
             if(result[i.first] > result[cur.second] + i.second){
                 pq.push({i.second * - 1, i.first});
                 result[i.first] = result[cur.second] + i.second;
@@ -215,6 +275,21 @@ int prim(int V, vector<vector<pair<int, int>>>& adj){
 V is total vertex, edges is edge list consist of {weight, {source, destination}}
 used for minimum spanning tree
 */
+int findParent(vector<int>& parent, int i) { 
+    if (parent[i] == i) return i;
+    else {  
+        int result = findParent(parent, parent[i]); 
+        parent[i] = result; 
+        return result; 
+    } 
+}
+
+void unionSet(vector<int>& parent, int i, int j) { 
+    int irep = findParent(parent, i);
+    int jrep = findParent(parent, j); 
+    if(jrep != irep) parent[irep] = jrep; 
+}
+
 int kruskal(int V, vector<pair<int, pair<int, int>>>& edges) {
     vector<int> parent(V, -1);
     int minCost = 0;
@@ -268,7 +343,7 @@ vector<int> graphColoring(int V, vector<vector<int>>& adj, int maxColor) {
 ===== Shorterst Path using BFS =====
 V is total vertex, adj list
 */
-vector<int> shortestPathBFS(int V, vector<vi> adj){
+vector<int> shortestPathBFS(int V, vector<vector<int>> adj){
     vector<int> dis(V, -1);
     queue<int> q;
     dis[0] = 0;
