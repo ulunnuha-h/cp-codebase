@@ -43,6 +43,51 @@ vector<int> findScc(vector<vector<int>>& adj, int n) {
     return res;
 }
 
+/* 
+===== Kosaraju's Algorithm  =====
+for finding the strongly connected components (SCCs) of a directed graph
+Strongly Connected Components represents a group of nodes that can reach each other through directed paths.
+*/
+class Kosaraju{
+    public:
+    int id = 1;
+    int timer = 0;
+
+    void dfsTime(vector<vector<int>>& adj, vector<pair<int, int>>& time, int a){
+        time[a].first = timer; timer++;
+        for(auto i : adj[a]) if(time[i].first == -1) dfsTime(adj, time, i);
+        time[a].second = timer; timer++;
+    }
+
+
+    void dfsComponent(vector<vector<int>>& rdj, vector<int>& res, int a){
+        res[a] = id;
+        for(auto i : rdj[a]) if(res[i] == -1) dfsComponent(rdj, res, i);
+    }
+
+    vector<int> findScc(vector<vector<int>>& adj, vector<vector<int>>& rdj, int n){
+        vector<int> res(n, -1);
+        vector<pair<int, int>> time(n, {-1, -1});
+        priority_queue<pair<int, int>> pq;
+        stack<int> st;
+
+        for(int i = 0 ; i < n ; i++) if(time[i].first == -1) dfsTime(adj, time, i);
+        for(int i = 0 ; i < n ; i++) pq.push({time[i].second, i});
+
+        while(!pq.empty()){
+            pair<int, int> cur = pq.top();
+            pq.pop();
+
+            if(res[cur.second] == -1){
+                dfsComponent(rdj, res, cur.second);
+                id++;
+            }
+        }
+
+        return res;
+    }
+};
+
 /*
 ===== Disjoint Set =====
 Used for union find algorithm
