@@ -149,7 +149,7 @@ public:
             parent[jrep] = irep; 
             size[irep] += size[jrep]; 
         } 
-} 
+    }
 }; 
 
 
@@ -157,19 +157,23 @@ public:
 ===== Dijkstra Algorithm =====
 V is total vertex, adj list, and S is start index (0-indexed)
 */
-vector<int> dijkstra(int V, vector<pair<int, int>> adj[], int S){
-    vector<int> result(V, INT_MAX);
+vector<long long> dijkstra(int V, vector<vector<pair<int, long long>>>& adj, int S) {
+    vector<long long> result(V, INT_MAX);
     result[S] = 0;
-    priority_queue<pair<int, int>> pq;
+    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
     pq.push({0, S});
-    while(!pq.empty()){
-        pair<int, int> cur = pq.top();
+    
+    while (!pq.empty()) {
+        auto [current_dist, u] = pq.top();
         pq.pop();
         
-        for(pair<int, int> i : adj[cur.second]){
-            if(result[i.first] > result[cur.second] + i.second){
-                pq.push({i.second * - 1, i.first});
-                result[i.first] = result[cur.second] + i.second;
+        if (current_dist > result[u]) continue;
+
+        for (auto [v, weight] : adj[u]) {
+            long long new_dist = current_dist + weight;
+            if (new_dist < result[v]) {
+                result[v] = new_dist;
+                pq.push({new_dist, v});
             }
         }
     }
